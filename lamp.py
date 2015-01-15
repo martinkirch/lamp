@@ -334,8 +334,10 @@ def run(transaction_file, flag_file, threshold, set_method, lcm_path, max_comb, 
 		transaction_list, columnid2name = readFile.readFiles(transaction_file, flag_file, keyItem)
 		max_comb = convertMaxComb( max_comb, len(columnid2name) )
 	except ValueError, e:
+		print e
 		return
 	except KeyError, e:
+		print e
 		return
 	
 	# run multiple test
