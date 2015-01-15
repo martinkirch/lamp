@@ -66,18 +66,22 @@ def readFiles(transaction_file, value_file, key):
 	
 	tid = 0
 	for line in open(transaction_file):
-		items=line.split()
 		t = transaction.Transaction(tid)
 		t.setID(tid)
 		tid += 1
 		t.setValue(0)
+		
+		items=line.split()
 		for item in items:
 			i = int(item)
 			if i == key:
 				t.setValue(1)
 			else:
-				i=itemsMap[item]
-				t.addItem(i)
+				try:
+					i=itemsMap[item]
+					t.addItem(i)
+				except KeyError:
+					pass
 		transaction_list.append(t)
 	
 	sys.stderr.write("Loaded %d transactions from %s\n" % (len(transaction_list), transaction_file))
