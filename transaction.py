@@ -59,6 +59,9 @@ class Transaction:
 #		print cmp(self.value, other.value)
 		return cmp(self.value, other.value)
 
+	def __str__(self):
+		return "%s (%s) %d - %s" % (self.name, self.id, self.value, str(self.itemset))
+
 	def setID( self, id ):
 		self.id = id
 

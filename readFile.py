@@ -35,23 +35,62 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #    Change readTransactionFile. If file has space the front and the end, remove them.
 # @editor aika, 11, Mar. 2014
 #    Change readFiles for keeping transaction ID.
+# @editor kirchgem, 15, Jan. 2015
+#    readFiles now reads a FIMI-like dataset, with a key item that's used as 1-flag in Fisher's test.
+#    column to names map is now provided as a side-input
 
 import sys, transaction, csv
 
-##
-# Read transaction and flag file and return transaction matrix.
-# transaction_file: 
-##
-def readFiles(transaction_file, value_file, delm):
-	transaction_list, gene2id, columnid2name = readTransactionFile(transaction_file, delm)
-	transaction_list = readValueFile(value_file, transaction_list, gene2id, delm)
+
+def readFiles(transaction_file, value_file, key):
+	"""
+	Reads FIMI-like transaction_file
+	value_file is a space/tab-separated text file giving (col name, ID)
+	key is an integer item ID that will be ommited in transactions and used as a value flag (1/0)
+	"""
+	transaction_list = []
+	#gene2id = {} # dictionary that gene name -> transaction ID
+	columnid2name = [] # list about mapping column id to column name
+	itemsMap = {}
+	itemCounter = 0
+	for line in open(value_file):
+		(artist,num)=line.split()
+		if int(num) == key:
+			continue
+		itemsMap[num] = itemCounter
+		columnid2name.append(artist)
+		itemCounter += 1
+	
+	sys.stderr.write("Last ID from %s: %d\n" % (value_file, itemCounter-1))
+
+	tid = 0
+	for line in open(transaction_file):
+		items=line.split()
+		t = transaction.Transaction(tid)
+		t.setID(tid)
+		tid += 1
+		t.setValue(0)
+		
+		for item in items:
+			i = int(item)
+			if i == key:
+				t.setValue(1)
+			else:
+				t.addItem(itemsMap[i])
+		transaction_list.append(t)
+	
+	sys.stderr.write("Loaded %d transactions from %s\n" % (len(transaction_list), transaction_file))
+	
+	sys.stderr.write(columnid2name.__str__())
+	#transaction_list, gene2id, columnid2name = readTransactionFile(transaction_file, delm)
+	#transaction_list = readValueFile(value_file, transaction_list, gene2id, delm)
 	transaction_list.sort() # sort transaction_list according to transaction_value
 	# Generate IDs to transactions
-	for i in xrange( 0, len(transaction_list) ):
-		t = transaction_list[i]
-		t.id = i
+	#for i in xrange( 0, len(transaction_list) ):
+	#	t = transaction_list[i]
+	#	t.id = i
 	# check transaction names two
-	checkTransName(transaction_list, transaction_file) # check transaction names two
+	#checkTransName(transaction_list, transaction_file) # check transaction names two
 	return transaction_list, columnid2name
 
 ##

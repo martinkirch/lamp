@@ -253,7 +253,7 @@ def outputResult( transaction_file, flag_file, threshold, set_method, max_comb, 
 			sys.stdout.write("%d\t%.5g\t%.5g\t" % (rank, l[1], k*l[1]))
 			out_column = ""
 			for i in l[0]:
-				out_column = out_column + columnid2name[i-1] + ","
+				out_column = out_column + columnid2name[i] + ","
 			sys.stdout.write("%s\t%d\t%d\t" % (out_column[:-1], len(l[0]), l[2]) )
 			if set_method == "u_test":
 				sys.stdout.write("%.5g\n" % l[3])
@@ -319,22 +319,19 @@ def version():
 
 ##
 # Run multiple test.
-# itemset_file: The file includes associations between TFs and genes.
-#     Each line indicates a gene.
-#     If gene is targeted by the TF, then value is 1, otherwise 0.
-# flag_file: Each line indicates a gene. The column1 is gene name.
-#     If gene has the feature, the column2 is 1. The other case 0.
+# itemset_file: a transaction file in FIMI format
+# flag_file: a flag giving "itemName itemId" , one couple per line
 # threshold: The statistical significance threshold.
 # set_method: The procedure name for calibration p-value (fisher/u_test).
 # max_comb: the maximal size which the largest combination size in tests set.
-# delm: delimiter of transaction_file and flag_file
+# keyItem: keyItem giving the actual flag
 ##
-def run(transaction_file, flag_file, threshold, set_method, lcm_path, max_comb, log_file, delm):
+def run(transaction_file, flag_file, threshold, set_method, lcm_path, max_comb, log_file, keyItem):
 	# read 2 files and get transaction list
 	sys.stderr.write( "Read input files ...\n" )
 	transaction_list = set()
 	try:
-		transaction_list, columnid2name = readFile.readFiles(transaction_file, flag_file, delm)
+		transaction_list, columnid2name = readFile.readFiles(transaction_file, flag_file, keyItem)
 		max_comb = convertMaxComb( max_comb, len(columnid2name) )
 	except ValueError, e:
 		return
@@ -374,9 +371,9 @@ def run(transaction_file, flag_file, threshold, set_method, lcm_path, max_comb, 
 	return enrich_lst, k, lam_star, columnid2name
 
 if __name__ == "__main__":
-	usage = "usage: %prog [options] transaction_file value_file significance_probability"
+	usage = "usage: %prog [options] transaction_file items_file significance_probability key_item\n"
 	p = OptionParser(usage = usage, version = "%s" % __version__)
-	p.add_option('-p', '--pvalue', dest = "pvalue_procedure", help = "Choose the p-value calculation procedure from 'fiehser' (Fisher's exact test), 'chi' (Chi-square test) or 'u_test' (Mann-Whitney's U-test)")
+	#p.add_option('-p', '--pvalue', dest = "pvalue_procedure", help = "Choose the p-value calculation procedure from 'fiehser' (Fisher's exact test), 'chi' (Chi-square test) or 'u_test' (Mann-Whitney's U-test)")
 
 	p.add_option('--lcm', dest = "lcm_path", default = "./lcm53/lcm", \
 				 help = "Set LCM program path if you do not use ./lcm53/lcm")
@@ -391,8 +388,8 @@ if __name__ == "__main__":
 	opts, args = p.parse_args()
 	
 	# check arguments
-	if len(args) != 3:
-		sys.stderr.write("Error: input [target-file], [expression-file] and [significance-level].\n")
+	if len(args) != 4:
+		sys.stderr.write("Error: "+usage)
 		sys.exit()
 
 	opts.max_comb = opts.max_comb.lower()
@@ -426,7 +423,10 @@ if __name__ == "__main__":
 
 	opts.delimiter = ','
 	
-	transaction_file = args[0]; flag_file = args[1]; threshold = float(args[2])
+	transaction_file = args[0]
+	flag_file = args[1]
+	threshold = float(args[2])
+	keyItem = int(args[3])
 	enrich_lst, k, lam_star, columnid2name \
-				= run(transaction_file, flag_file, threshold, opts.pvalue_procedure, \
-					  opts.lcm_path, opts.max_comb, log_file, opts.delimiter)
+				= run(transaction_file, flag_file, threshold, "fisher", \
+					  opts.lcm_path, opts.max_comb, log_file, keyItem)
