@@ -86,7 +86,6 @@ def readFiles(transaction_file, value_file, key):
 	
 	sys.stderr.write("Loaded %d transactions from %s\n" % (len(transaction_list), transaction_file))
 	
-	sys.stderr.write(columnid2name.__str__())
 	#transaction_list, gene2id, columnid2name = readTransactionFile(transaction_file, delm)
 	#transaction_list = readValueFile(value_file, transaction_list, gene2id, delm)
 	transaction_list.sort() # sort transaction_list according to transaction_value
