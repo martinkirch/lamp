@@ -42,6 +42,7 @@ import transaction
 import readFile
 import frepattern.frequentPatterns as frequentPatterns
 from optparse import OptionParser
+import traceback
 
 import functions.functionsSuper as fs
 import functions.functions4fisher as functions4fisher
@@ -334,10 +335,10 @@ def run(transaction_file, flag_file, threshold, set_method, lcm_path, max_comb, 
 		transaction_list, columnid2name = readFile.readFiles(transaction_file, flag_file, keyItem)
 		max_comb = convertMaxComb( max_comb, len(columnid2name) )
 	except ValueError, e:
-		print e
+		traceback.print_exc()
 		return
 	except KeyError, e:
-		print e
+		traceback.print_exc()
 		return
 	
 	# run multiple test
