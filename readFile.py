@@ -54,7 +54,9 @@ def readFiles(transaction_file, value_file, key):
 	itemsMap = {}
 	itemCounter = 0
 	for line in open(value_file):
-		(artist,num)=line.split()
+		splitted=line.split()
+		artist = " ".join(splitted[:-1])
+		num = splitted[-1]
 		if int(num) != key:
 			itemsMap[num] = itemCounter
 			columnid2name.append(artist)
