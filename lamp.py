@@ -359,7 +359,7 @@ def run(transaction_file, flag_file, threshold, set_method, lcm_path, max_comb, 
 		outlog.close()
 	except IOError, e:
 		outlog.close()
-
+	
 	sys.stderr.write( "Output results ...\n" )
 	# output result
 	outputResult( transaction_file, flag_file, threshold, set_method, max_comb, \
@@ -367,7 +367,7 @@ def run(transaction_file, flag_file, threshold, set_method, lcm_path, max_comb, 
 	# output time cost
 	sys.stdout.write("Time (sec.): Computing correction factor %.3f, Enumerating significant combinations %.3f, Total %.3f\n" \
 					 % (correction_term_time-starttime, finish_test_time - correction_term_time, finish_test_time - starttime))
-
+	
 	return enrich_lst, k, lam_star, columnid2name
 
 if __name__ == "__main__":
@@ -427,6 +427,4 @@ if __name__ == "__main__":
 	flag_file = args[1]
 	threshold = float(args[2])
 	keyItem = int(args[3])
-	enrich_lst, k, lam_star, columnid2name \
-				= run(transaction_file, flag_file, threshold, "fisher", \
-					  opts.lcm_path, opts.max_comb, log_file, keyItem)
+	run(transaction_file, flag_file, threshold, "fisher", opts.lcm_path, opts.max_comb, log_file, keyItem)
